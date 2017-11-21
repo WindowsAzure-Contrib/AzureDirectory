@@ -1,9 +1,9 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Lucene.Net.Store.Azure
 {
@@ -44,7 +44,7 @@ namespace Lucene.Net.Store.Azure
             }
             catch (StorageException webErr)
             {
-                if (_handleWebException(blob, webErr))
+                if (HandleWebException(blob, webErr))
                     return IsLocked();
             }
             _leaseid = null;
@@ -61,27 +61,38 @@ namespace Lucene.Net.Store.Azure
                 {
                     _leaseid = blob.AcquireLease(TimeSpan.FromSeconds(60), _leaseid);
                     Debug.Print("AzureLock:Obtain({0}): AcquireLease : {1}", _lockFile, _leaseid);
-                    
+
                     // keep the lease alive by renewing every 30 seconds
                     long interval = (long)TimeSpan.FromSeconds(30).TotalMilliseconds;
-                    _renewTimer = new Timer((obj) => 
+                    _renewTimer = new Timer((obj) =>
                         {
                             try
                             {
                                 AzureLock al = (AzureLock)obj;
                                 al.Renew();
                             }
-                            catch (Exception err) { Debug.Print(err.ToString()); } 
+                            catch (Exception err) { Debug.Print(err.ToString()); }
                         }, this, interval, interval);
                 }
-                return !String.IsNullOrEmpty(_leaseid);
+                return !string.IsNullOrEmpty(_leaseid);
             }
-            catch (StorageException webErr)
+            catch (StorageException ex)
             {
-                if (_handleWebException(blob, webErr))
+                if (HandleWebException(blob, ex))
+                {
                     return Obtain();
+                }
+                else
+                {
+                    Debug.Print("AzureLock:Obtain unexpected exception {0}", ex.ToString());
+                    return false;
+                }
             }
-            return false;
+            catch (Exception ex)
+            {
+                Debug.Print("AzureLock:Obtain unexpected exception {0}", ex.ToString());
+                return false;
+            }
         }
 
         private Timer _renewTimer;
@@ -132,7 +143,7 @@ namespace Lucene.Net.Store.Azure
             return String.Format("AzureLock@{0}.{1}", _lockFile, _leaseid);
         }
 
-        private bool _handleWebException(ICloudBlob blob, StorageException err)
+        private bool HandleWebException(ICloudBlob blob, StorageException err)
         {
             if (err.RequestInformation.HttpStatusCode == 404 || err.RequestInformation.HttpStatusCode == 409)
             {

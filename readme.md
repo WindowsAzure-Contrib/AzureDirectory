@@ -5,6 +5,8 @@
 A fork of this project: https://azuredirectory.codeplex.com/
 Updated to work with Lucene 3.0.3, and version 2.1.0.3 of the Azure Storage client.
 
+This branch has been updated to use Azure.Storage.Blobs (V12) instead of older Microsoft.Azure.Storage.Blob (V11) libraries, and Lucene v4.8.0-beta00012.
+
 ## Project description
 
 Lucene.Net is a robust open source search technology which has an abstract interface called a Directory for defining how the index is stored. AzureDirectory is an implementation of that interface for Windows Azure Blob Storage.

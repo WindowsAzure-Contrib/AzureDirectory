@@ -2,28 +2,28 @@
 
 namespace Lucene.Net.Store.Azure
 {
-  public static class BlobMutexManager
-  {
-
-    public static Mutex GrabMutex(string name)
+    public static class BlobMutexManager
     {
-      var mutexName = "luceneSegmentMutex_" + name;
 
-      var notExisting = false;
+        public static Mutex GrabMutex(string name)
+        {
+            var mutexName = "luceneSegmentMutex_" + name;
 
-      if (Mutex.TryOpenExisting(mutexName, out var mutex))
-      {
-        return mutex;
-      }
+            var notExisting = false;
 
-      // Here we know the mutex either doesn't exist or we don't have the necessary permissions.
+            if (Mutex.TryOpenExisting(mutexName, out var mutex))
+            {
+                return mutex;
+            }
 
-      if (!Mutex.TryOpenExisting(mutexName, out mutex))
-      {
-        notExisting = true;
-      }
+            // Here we know the mutex either doesn't exist or we don't have the necessary permissions.
 
-      return notExisting ? new Mutex(false, mutexName, out _) : Mutex.OpenExisting(mutexName);
+            if (!Mutex.TryOpenExisting(mutexName, out mutex))
+            {
+                notExisting = true;
+            }
+
+            return notExisting ? new Mutex(false, mutexName, out _) : Mutex.OpenExisting(mutexName);
+        }
     }
-  }
 }

@@ -6,3 +6,4 @@ csx/
 Profiles/
 *.ncrunch*
 packages/
+.vs/

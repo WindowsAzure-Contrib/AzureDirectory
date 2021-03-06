@@ -36,7 +36,7 @@ namespace AzureDirectory.Tests
 
             var indexWriterConfig = new IndexWriterConfig(
                 Lucene.Net.Util.LuceneVersion.LUCENE_48,
-                new StandardAnalyzer(Lucene.Net.Util.LuceneVersion.LUCENE_48));
+                new StandardAnalyzer(Lucene.Net.Util.LuceneVersion.LUCENE_48, StandardAnalyzer.STOP_WORDS_SET));
 
             int dog = 0, cat = 0, car = 0;
 
@@ -47,10 +47,10 @@ namespace AzureDirectory.Tests
                 {
                     var bodyText = GeneratePhrase(40);
                     var doc = new Document {
-            new TextField("id", DateTime.Now.ToFileTimeUtc() + "-" + iDoc, Field.Store.YES),
-            new TextField("Title", GeneratePhrase(10), Field.Store.YES),
-            new TextField("Body", bodyText, Field.Store.YES)
-          };
+                        new TextField("id", DateTime.Now.ToFileTimeUtc() + "-" + iDoc, Field.Store.YES),
+                        new TextField("Title", GeneratePhrase(10), Field.Store.YES),
+                        new TextField("Body", bodyText, Field.Store.YES)
+                    };
                     dog += bodyText.Contains(" dog ") ? 1 : 0;
                     cat += bodyText.Contains(" cat ") ? 1 : 0;
                     car += bodyText.Contains(" car ") ? 1 : 0;
